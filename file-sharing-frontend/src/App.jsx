@@ -1,9 +1,12 @@
 import { BrowserRouter } from "react-router-dom"
 import AppRoutes from "./routes/AppRoutes"
+import { AuthProvider } from "./context/AuthContext"
 
 const App = () => (
   <BrowserRouter>
-    <AppRoutes />
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   </BrowserRouter>
 )
 
