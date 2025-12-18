@@ -91,6 +91,55 @@ router.get("/stream/:id", async (req, res) => {
   }
 })
 
+router.post("/share/:fileId", protect, async (req, res) => {
+  const fileId = req.params.fileId
+  const token = crypto.randomBytes(32).toString("hex")
+
+  // Ensure file belongs to user
+  const [[file]] = await db.query(
+    "SELECT id FROM files WHERE id = ? AND user_id = ?",
+    [fileId, req.user]
+  )
+
+  if (!file) {
+    return res.status(403).json({ message: "Access denied" })
+  }
+
+  await db.query(
+    `INSERT INTO file_shares (file_id, share_token, expires_at)
+     VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 1 DAY))`,
+    [fileId, token]
+  )
+
+  res.json({
+    shareLink: `http://localhost:5173/shared/${token}`
+  })
+})
+
+router.get("/shared/:token", protect, async (req, res) => {
+  const [[file]] = await db.query(
+    `SELECT files.*
+     FROM file_shares
+     JOIN files ON file_shares.file_id = files.id
+     WHERE file_shares.share_token = ?
+     AND file_shares.expires_at > NOW()`,
+    [req.params.token]
+  )
+
+  if (!file) {
+    return res.status(404).json({ message: "Link invalid or expired" })
+  }
+
+  res.setHeader("Content-Type", file.mime_type)
+  res.setHeader(
+    "Content-Disposition",
+    `inline; filename="${file.original_name}"`
+  )
+
+  res.sendFile(file.path, { root: process.cwd() })
+})
+
+
 
 
 export default router

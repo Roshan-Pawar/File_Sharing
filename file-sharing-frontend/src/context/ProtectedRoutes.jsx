@@ -1,13 +1,18 @@
-import { Navigate } from "react-router-dom"
-import { useContext } from "react"
-import { AuthContext } from "../context/AuthContext"
+import { Navigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useContext(AuthContext)
+  const { user, loading } = useContext(AuthContext);
 
-  if (loading) return <div>Loading...</div>
+  if (loading) return <div>Loading...</div>;
 
-  return user ? children : <Navigate to="/" />
-}
+  if (!user) {
+    localStorage.setItem("redirectAfterLogin", location.pathname);
+    return <Navigate to="/" />;
+  }
 
-export default ProtectedRoute
+  return user ? children : <Navigate to="/" />;
+};
+
+export default ProtectedRoute;

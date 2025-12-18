@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem("token")
     if (token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUser({ token })
     }
     setLoading(false)

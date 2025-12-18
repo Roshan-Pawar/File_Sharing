@@ -1,5 +1,5 @@
 import { useDropzone } from "react-dropzone"
-import Api from "../services/Api"
+import Api from "../services/api"
 
 const UploadModal = ({ onClose }) => {
   const { getRootProps, getInputProps } = useDropzone({
