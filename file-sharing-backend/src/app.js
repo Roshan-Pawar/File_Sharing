@@ -5,7 +5,13 @@ import fileRoutes from "./routes/file.routes.js"
 
 const app = express()
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }))
+app.use(cors({
+    origin: [
+      "http://localhost:5173",
+      "https://filesharing-production-fbad.up.railway.app/"
+    ],
+    credentials: true
+  }))
 app.use(express.json())
 app.use("/uploads", express.static("uploads"))
 
