@@ -8,9 +8,9 @@ const app = express()
 app.use(cors({
     origin: [
       "http://localhost:5173",
-      "https://filesharing-production-fbad.up.railway.app/"
+      "https://file-sharing-jade.vercel.app"
     ],
-    credentials: true
+    methods: ["GET", "POST", "PUT", "DELETE"],
   }))
 app.use(express.json())
 app.use("/uploads", express.static("uploads"))
