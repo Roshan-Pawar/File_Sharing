@@ -7,7 +7,7 @@ Users can upload files, view them, and share access via secure links that work o
 
 ## 🔗 Live Project Links
 
-- **Frontend (Vercel):** [https://your-frontend-url.vercel.app ](https://file-sharing-jade.vercel.app/)  
+- **Frontend (Vercel):** https://file-sharing-jade.vercel.app/  
 
 ---
 
@@ -63,6 +63,7 @@ Users can upload files, view them, and share access via secure links that work o
 - npm run dev
 
 ### 4️⃣ MySQL Database Setup
+- Configure local MySQL DB Values in file_sharing_backend/src/config/db.js
 - CREATE DATABASE file_sharing_app;
 
 - USE file_sharing_app;
@@ -98,5 +99,6 @@ Users can upload files, view them, and share access via secure links that work o
 
 ## ⭐ If you like this project, give it a star!
    
+
 
 
