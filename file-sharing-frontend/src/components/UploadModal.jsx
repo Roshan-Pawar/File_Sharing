@@ -9,7 +9,7 @@ const UploadModal = ({ onClose }) => {
       files.forEach(file => formData.append("files", file))
 
       try {
-        await Api.post("/files/upload", formData)
+        await Api.post("/api/files/upload", formData)
         onClose()
         window.location.reload() // simple for now
       } catch {

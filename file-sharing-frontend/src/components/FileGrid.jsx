@@ -7,7 +7,7 @@ const FileGrid = () => {
 
   useEffect(() => {
     const fetchFiles = async () => {
-      const { data } = await Api.get("/files")
+      const { data } = await Api.get("/api/files")
       setFiles(data)
     }
     fetchFiles()

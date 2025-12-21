@@ -54,7 +54,10 @@ router.get("/signed-url/:id", protect, async (req, res) => {
   })
 
   res.json({
-    url: `http://localhost:5000/api/files/stream/${file.id}?token=${token}`
+    // for local
+    // url: `http://localhost:5000/api/files/stream/${file.id}?token=${token}`
+    //for production
+    url: `${process.env.BACKEND_URL}/api/files/stream/${file.id}?token=${token}`
   })
 })
 
@@ -112,7 +115,8 @@ router.post("/share/:fileId", protect, async (req, res) => {
   )
 
   res.json({
-    shareLink: `http://localhost:5173/shared/${token}`
+    // shareLink: `http://localhost:5173/shared/${token}`
+    shareLink: `https://file-sharing-jade.vercel.app/shared/${token}`
   })
 })
 

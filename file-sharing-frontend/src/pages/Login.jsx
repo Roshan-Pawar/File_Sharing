@@ -12,7 +12,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await Api.post("/auth/login", { email, password });
+      const { data } = await Api.post("/api/auth/login", { email, password });
       localStorage.setItem("token", data.token);
       login(data);
       navigate("/dashboard");

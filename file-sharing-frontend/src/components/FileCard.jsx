@@ -3,7 +3,7 @@ import Api from "../services/api";
 const FileCard = ({ file }) => {
   const openFile = async () => {
     try {
-      const { data } = await Api.get(`/files/signed-url/${file.id}`);
+      const { data } = await Api.get(`/api/files/signed-url/${file.id}`);
       window.open(data.url, "_blank");
     } catch {
       alert("Unable to open file");

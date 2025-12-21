@@ -1,12 +1,12 @@
 import { useParams } from "react-router-dom"
 import { useEffect } from "react"
-import api from "../services/api"
+import Api from "../services/api"
 
 const SharedFile = () => {
   const { token } = useParams()
 
   useEffect(() => {
-    api.get(`/files/shared/${token}`, {
+    Api.get(`/api/files/shared/${token}`, {
       responseType: "blob"
     })
       .then(res => {

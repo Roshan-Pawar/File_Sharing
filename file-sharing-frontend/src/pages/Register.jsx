@@ -11,7 +11,7 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault()
     try {
-      await Api.post("/auth/register", { name, email, password })
+      await Api.post("/api/auth/register", { name, email, password })
       alert("Registration successful")
       navigate("/")
     } catch (err) {
