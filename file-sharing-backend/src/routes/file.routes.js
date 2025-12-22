@@ -5,6 +5,7 @@ import { uploadFiles, getMyFiles, shareFile } from "../controllers/file.controll
 import generateTempToken from "../utils/generateTempToken.js"
 import jwt from "jsonwebtoken"
 import db from "../config/db.js"
+import crypto from "crypto";
 
 
 const router = express.Router()

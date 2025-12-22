@@ -9,7 +9,8 @@ export const uploadFiles = async (req, res) => {
     file.filename,
     file.mimetype,
     file.size,
-    file.path
+    // file.path    for local
+    `uploads/${file.filename}`
   ])
 
   await db.query(
