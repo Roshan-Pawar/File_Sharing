@@ -1,5 +1,6 @@
 import multer from "multer"
-// import path from "path"
+import path from "path"
+import fs from "fs";
 
 // for local, files are stored in uploads folder
 // const storage = multer.diskStorage({
