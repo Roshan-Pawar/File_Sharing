@@ -1,6 +1,9 @@
+import { useState } from "react";
 import Api from "../services/api";
 
 const FileCard = ({ file }) => {
+  const [showShare, setShowShare] = useState(false);
+
   const openFile = async () => {
     try {
       const { data } = await Api.get(`/api/files/signed-url/${file.id}`);
@@ -9,17 +12,6 @@ const FileCard = ({ file }) => {
       alert("Unable to open file");
     }
   };
-
-  const shareFile = async (e) => {
-    e.stopPropagation() 
-    try {
-      const { data } = await Api.post(`/files/share/${file.id}`)
-      await navigator.clipboard.writeText(data.shareLink)
-      alert("link copied to clipboard!")
-    } catch {
-      alert("Failed to generate link")
-    }
-  }
 
   return (
     <div
@@ -33,11 +25,17 @@ const FileCard = ({ file }) => {
       </p>
       <p className="text-xs text-gray-500">{file.created_at}</p>
       <button
-        onClick={shareFile}
-        className="text-sm text-blue-600 hover:underline"
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowShare(true);
+        }}
       >
         Share
       </button>
+
+      {showShare && (
+        <ShareModal fileId={file.id} onClose={() => setShowShare(false)} />
+      )}
     </div>
   );
 };

@@ -23,17 +23,6 @@ router.get("/view/:id", protect, async (req, res) => {
   if (!file) {
     return res.status(404).json({ message: "File not found" })
   }
-
-  res.setHeader("Content-Type", file.mime_type)
-  res.setHeader(
-    "Content-Disposition",
-    `inline; filename="${file.original_name}"`
-  )
-
-  res.sendFile(
-    file.path,
-    { root: process.cwd() }
-  )
 })
 
 // generate signed URL
@@ -64,87 +53,69 @@ router.get("/signed-url/:id", protect, async (req, res) => {
 
 // stream file using temp token
 router.get("/stream/:id", async (req, res) => {
-  const { token } = req.query
+  const { token } = req.query;
 
-  if (!token) {
-    return res.status(401).send("Missing token")
-  }
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+  const [[file]] = await db.query(
+    "SELECT * FROM files WHERE id = ?",
+    [decoded.fileId]
+  );
 
-    if (decoded.fileId !== Number(req.params.id)) {
-      return res.status(403).send("Invalid access")
-    }
+  res.redirect(file.path);
+});
 
-    const [[file]] = await db.query(
-      "SELECT * FROM files WHERE id = ?",
-      [req.params.id]
-    )
-
-    res.setHeader("Content-Type", file.mime_type)
-    res.setHeader(
-      "Content-Disposition",
-      `inline; filename="${file.original_name}"`
-    )
-
-    res.sendFile(file.path, { root: process.cwd() })
-
-  } catch {
-    res.status(401).send("Token expired or invalid")
-  }
-})
 
 router.post("/share/:fileId", protect, async (req, res) => {
-  const fileId = req.params.fileId
-  const token = crypto.randomBytes(32).toString("hex")
+  const { emails } = req.body; // array
+  const fileId = req.params.fileId;
 
-  // Ensure file belongs to user
+  if (!emails || emails.length === 0) {
+    return res.status(400).json({ message: "No emails provided" });
+  }
+
   const [[file]] = await db.query(
     "SELECT id FROM files WHERE id = ? AND user_id = ?",
     [fileId, req.user]
-  )
+  );
 
   if (!file) {
-    return res.status(403).json({ message: "Access denied" })
+    return res.status(403).json({ message: "Access denied" });
   }
 
-  await db.query(
-    `INSERT INTO file_shares (file_id, share_token, expires_at)
-     VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 1 DAY))`,
-    [fileId, token]
-  )
+  for (const email of emails) {
+    const [[user]] = await db.query(
+      "SELECT id FROM users WHERE email = ?",
+      [email]
+    );
 
-  res.json({
-    // shareLink: `http://localhost:5173/shared/${token}`
-    shareLink: `https://file-sharing-jade.vercel.app/shared/${token}`
-  })
-})
-
-router.get("/shared/:token", protect, async (req, res) => {
-  const [[file]] = await db.query(
-    `SELECT files.*
-     FROM file_shares
-     JOIN files ON file_shares.file_id = files.id
-     WHERE file_shares.share_token = ?
-     AND file_shares.expires_at > NOW()`,
-    [req.params.token]
-  )
-
-  if (!file) {
-    return res.status(404).json({ message: "Link invalid or expired" })
+    await db.query(
+      `INSERT INTO file_shares
+       (file_id, shared_by, shared_with_email, shared_with_user)
+       VALUES (?, ?, ?, ?)`,
+      [fileId, req.user, email, user?.id || null]
+    );
   }
 
-  res.setHeader("Content-Type", file.mime_type)
-  res.setHeader(
-    "Content-Disposition",
-    `inline; filename="${file.original_name}"`
-  )
-
-  res.sendFile(file.path, { root: process.cwd() })
-})
+  res.json({ message: "File shared successfully" });
+});
 
 
+router.get("/shared-with-me", protect, async (req, res) => {
+  const [files] = await db.query(
+    `
+    SELECT files.*
+    FROM file_shares
+    JOIN files ON file_shares.file_id = files.id
+    WHERE file_shares.shared_with_user = ?
+       OR file_shares.shared_with_email = (
+         SELECT email FROM users WHERE id = ?
+       )
+    `,
+    [req.user, req.user]
+  );
 
+  res.json(files);
+});
 
 export default router

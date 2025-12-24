@@ -1,32 +1,18 @@
-import multer from "multer"
-import path from "path"
-import fs from "fs";
+import multer from "multer";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "./cloudinary.js";
 
-// for local, files are stored in uploads folder
-// const storage = multer.diskStorage({
-//   destination: "uploads/",
-//   filename: (_, file, cb) => {
-//     cb(null, `${Date.now()}-${file.originalname}`)
-//   }
-// })
-
-// const upload = multer({ storage })
-
-const uploadDir = path.join(process.cwd(), "uploads");
-
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, uploadDir);
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "file-sharing-app",
+    resource_type: "auto",
+    public_id: (req, file) =>
+      `${Date.now()}-${file.originalname}`,
   },
-  filename(req, file, cb) {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  }
 });
 
 const upload = multer({ storage });
 
-export default upload
+export default upload;
+
