@@ -14,8 +14,9 @@ export const uploadFiles = async (req, res) => {
       file.size,
       file.path
     ]);
-    console.log(file.path);
     console.log("FILES:", req.files);
+    console.log("BODY:", req.body);
+    console.log(file.path);
 
     await db.query(
       `INSERT INTO files

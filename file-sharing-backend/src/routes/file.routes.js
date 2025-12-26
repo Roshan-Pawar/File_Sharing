@@ -10,6 +10,11 @@ import crypto from "crypto";
 
 const router = express.Router()
 
+router.post("/upload", (req, res, next) => {
+  console.log("Upload hit");
+  next();
+});
+
 router.post("/upload", protect, upload.array("files"), uploadFiles)
 router.get("/", protect, getMyFiles)
 router.post("/share", protect, shareFile)
