@@ -2,31 +2,34 @@ import db from "../config/db.js"
 
 export const uploadFiles = async (req, res) => {
   try {
+    console.log("FILES RECEIVED:", req.files);
+
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: "No files uploaded" });
     }
 
-    const values = req.files.map(file => [
-      req.user,
-      file.originalname,
-      file.filename,    
-      file.mimetype,
-      file.size,
-      file.path
-    ]);
-    console.log(file.path);
+    const userId = req.user;
 
-    await db.query(
-      `INSERT INTO files
-       (user_id, original_name, file_name, mime_type, size, path)
-       VALUES ?`,
-      [values]
-    );
+    for (const f of req.files) {
+      await db.query(
+        `INSERT INTO files
+         (user_id, original_name, file_name, mime_type, size, path)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          userId,
+          f.originalname,
+          f.filename,
+          f.mimetype,
+          f.size,
+          f.path
+        ]
+      );
+    }
 
     res.status(201).json({ message: "Files uploaded successfully" });
 
   } catch (err) {
-    console.error("Upload error:", err);
+    console.error("Upload error FULL:", err);
     res.status(500).json({ message: "File upload failed" });
   }
 };
