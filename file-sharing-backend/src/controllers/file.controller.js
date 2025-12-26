@@ -9,13 +9,11 @@ export const uploadFiles = async (req, res) => {
     const values = req.files.map(file => [
       req.user,
       file.originalname,
-      file.public_id,    
+      file.filename,    
       file.mimetype,
       file.size,
       file.path
     ]);
-    console.log("FILES:", req.files);
-    console.log("BODY:", req.body);
     console.log(file.path);
 
     await db.query(

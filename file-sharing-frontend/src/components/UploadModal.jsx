@@ -11,7 +11,7 @@ const UploadModal = ({ onClose }) => {
       try {
         await Api.post("/api/files/upload", formData)
         onClose()
-        window.location.reload() // simple for now
+        window.location.reload()
       } catch {
         alert("Upload failed")
       }
