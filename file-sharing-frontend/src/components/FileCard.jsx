@@ -1,7 +1,8 @@
 import { useState } from "react";
 import Api from "../services/api";
+import ShareModal from "./ShareModal";
 
-const FileCard = ({ file }) => {
+const FileCard = ({ file, onDelete}) => {
   const [showShare, setShowShare] = useState(false);
 
   const openFile = async () => {
@@ -13,6 +14,18 @@ const FileCard = ({ file }) => {
     }
   };
 
+  const deleteFile = async (e) => {
+    e.stopPropagation();
+    if (!confirm("Delete this file?")) return;
+
+    await Api.delete(`/api/files/${file.id}`);
+    onDelete(file.id);
+  };
+
+  const istTime = new Date(file.created_at).toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+  });
+
   return (
     <div
       onClick={openFile}
@@ -23,15 +36,23 @@ const FileCard = ({ file }) => {
       <p className="text-xs text-gray-500">
         {(file.size / 1024).toFixed(2)} KB
       </p>
-      <p className="text-xs text-gray-500">{file.created_at}</p>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          setShowShare(true);
-        }}
-      >
-        Share
-      </button>
+      <p className="text-xs text-gray-500">{istTime}</p>
+
+      <div className="flex gap-3 mt-2">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowShare(true);
+          }}
+          className="text-blue-600 text-sm"
+        >
+          Share
+        </button>
+
+        <button onClick={deleteFile} className="text-red-600 text-sm">
+          Delete
+        </button>
+      </div>
 
       {showShare && (
         <ShareModal fileId={file.id} onClose={() => setShowShare(false)} />

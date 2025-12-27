@@ -117,4 +117,20 @@ router.get("/shared-with-me", protect, async (req, res) => {
   res.json(files);
 });
 
+router.delete("/:id", protect, async (req, res) => {
+  const [[file]] = await db.query(
+    "SELECT * FROM files WHERE id = ? AND user_id = ?",
+    [req.params.id, req.user]
+  );
+
+  if (!file) return res.sendStatus(404);
+
+  const publicId = file.file_name; // Cloudinary public_id
+  await cloudinary.uploader.destroy(publicId);
+  await db.query("DELETE FROM files WHERE id = ?", [file.id]);
+
+  res.json({ message: "Deleted" });
+});
+
+
 export default router

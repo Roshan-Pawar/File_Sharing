@@ -1,15 +1,7 @@
-import { useContext } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { AuthContext } from "../context/AuthContext"
+import { Link } from "react-router-dom";
 
-const Sidebar = () => {
-  const { logout } = useContext(AuthContext)
-  const navigate = useNavigate()
+const Sidebar = (onUploadClick) => {
 
-  const handleLogout = () => {
-    logout()
-    navigate("/")
-  }
   return (
     <div className="w-64 bg-gray-100 h-full p-4">
       <ul className="space-y-3">
@@ -23,15 +15,17 @@ const Sidebar = () => {
             Shared with Me
           </Link>
         </li>
-        <li
-          onClick={handleLogout}
-          className="text-red-600 cursor-pointer p-2"
-        >
-          Logout
+        <li>
+          <button
+            onClick={onUploadClick}
+            className="w-full bg-blue-600 text-white p-2 rounded"
+          >
+            Upload
+          </button>
         </li>
       </ul>
     </div>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;

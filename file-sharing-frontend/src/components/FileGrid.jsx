@@ -5,6 +5,10 @@ import FileCard from "./FileCard"
 const FileGrid = () => {
   const [files, setFiles] = useState([])
 
+  const handleDelete = (id) => {
+    setFiles(prev => prev.filter(f => f.id !== id));
+  };
+
   useEffect(() => {
     const fetchFiles = async () => {
       const { data } = await Api.get("/api/files")
@@ -16,7 +20,7 @@ const FileGrid = () => {
   return (
     <div className="grid grid-cols-4 gap-4">
       {files.map(file => (
-        <FileCard key={file.id} file={file} />
+        <FileCard key={file.id} file={file} onDelete={handleDelete} />
       ))}
     </div>
   )
