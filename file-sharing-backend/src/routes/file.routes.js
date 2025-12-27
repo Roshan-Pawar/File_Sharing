@@ -3,6 +3,7 @@ import upload from "../config/multer.js"
 import protect from "../middlewares/auth.middleware.js"
 import { uploadFiles, getMyFiles, shareFile } from "../controllers/file.controller.js"
 import db from "../config/db.js"
+import cloudinary from "../config/cloudinary.js"
 
 
 const router = express.Router()
