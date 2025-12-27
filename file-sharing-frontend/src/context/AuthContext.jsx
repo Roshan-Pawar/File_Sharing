@@ -1,22 +1,13 @@
-import { createContext, useState, useEffect } from "react"
+import { createContext, useState } from "react"
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("user"))
-  );
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const token = localStorage.getItem("token")
-    if (token) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setUser({ token })
-    }
-    setLoading(false)
-  }, [])
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
   const login = (userData, token) => {
     localStorage.setItem("token", token);
@@ -31,7 +22,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

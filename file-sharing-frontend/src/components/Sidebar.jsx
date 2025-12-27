@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const Sidebar = (onUploadClick) => {
+const Sidebar = ({onUploadClick}) => {
 
   return (
     <div className="w-64 bg-gray-100 h-full p-4">
