@@ -14,7 +14,7 @@ const Navbar = () => {
           onClick={() => setOpen(!open)}
           className="cursor-pointer"
         >
-          Welcome, {user.name}
+          Welcome, {user.name} ⌄
         </span>
 
         {open && (

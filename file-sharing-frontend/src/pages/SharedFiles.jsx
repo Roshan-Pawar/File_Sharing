@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
-import FileGrid from "../components/FileGrid";
 import Api from "../services/api";
+import UploadModal from "../components/UploadModal";
+import SharedFileGrid from "../components/SharedFileGrid";
 
 const SharedFiles = () => {
   const [files, setFiles] = useState([]);
@@ -22,7 +23,7 @@ const SharedFiles = () => {
         <div className="flex-1 p-6 bg-gray-50">
           {files.length === 0
             ? <p>No shared files</p>
-            : <FileGrid files={files} setFiles={setFiles} />}
+            : <SharedFileGrid files={files} />}
         </div>
       </div>
       {showUpload && (

@@ -4,7 +4,6 @@ import Dashboard from "../pages/Dashboard";
 import ProtectedRoute from "../context/ProtectedRoutes";
 import SharedFiles from "../pages/SharedFiles";
 import Register from "../pages/Register";
-import SharedFile from "../pages/SharedFiles";
 
 const AppRoutes = () => (
   <Routes>
@@ -23,15 +22,6 @@ const AppRoutes = () => (
       element={
         <ProtectedRoute>
           <SharedFiles />
-        </ProtectedRoute>
-      }
-    />
-
-    <Route
-      path="/shared/:token"
-      element={
-        <ProtectedRoute>
-          <SharedFile />
         </ProtectedRoute>
       }
     />

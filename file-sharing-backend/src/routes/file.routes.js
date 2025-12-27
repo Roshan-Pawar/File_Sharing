@@ -2,8 +2,6 @@ import express from "express"
 import upload from "../config/multer.js"
 import protect from "../middlewares/auth.middleware.js"
 import { uploadFiles, getMyFiles, shareFile } from "../controllers/file.controller.js"
-import generateTempToken from "../utils/generateTempToken.js"
-import jwt from "jsonwebtoken"
 import db from "../config/db.js"
 
 
@@ -23,47 +21,6 @@ router.get("/view/:id", protect, async (req, res) => {
     return res.status(404).json({ message: "File not found" })
   }
 })
-
-// generate signed URL
-router.get("/signed-url/:id", protect, async (req, res) => {
-  const fileId = req.params.id
-
-  const [[file]] = await db.query(
-    "SELECT * FROM files WHERE id = ? AND user_id = ?",
-    [fileId, req.user]
-  )
-
-  if (!file) {
-    return res.status(404).json({ message: "File not found" })
-  }
-
-  const token = generateTempToken({
-    fileId: file.id,
-    userId: req.user
-  })
-
-  res.json({
-    // for local
-    // url: `http://localhost:5000/api/files/stream/${file.id}?token=${token}`
-    //for production
-    url: `${process.env.BACKEND_URL}/api/files/stream/${file.id}?token=${token}`
-  })
-})
-
-// stream file using temp token
-router.get("/stream/:id", async (req, res) => {
-  const { token } = req.query;
-
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-  const [[file]] = await db.query(
-    "SELECT * FROM files WHERE id = ?",
-    [decoded.fileId]
-  );
-
-  res.redirect(file.path);
-});
-
 
 router.post("/share/:fileId", protect, async (req, res) => {
   const { emails } = req.body; // array
@@ -118,19 +75,39 @@ router.get("/shared-with-me", protect, async (req, res) => {
 });
 
 router.delete("/:id", protect, async (req, res) => {
-  const [[file]] = await db.query(
-    "SELECT * FROM files WHERE id = ? AND user_id = ?",
-    [req.params.id, req.user]
-  );
+  try {
+    const fileId = req.params.id;
 
-  if (!file) return res.sendStatus(404);
+    const [[file]] = await db.query(
+      "SELECT * FROM files WHERE id = ? AND user_id = ?",
+      [fileId, req.user]
+    );
 
-  const publicId = file.file_name; // Cloudinary public_id
-  await cloudinary.uploader.destroy(publicId);
-  await db.query("DELETE FROM files WHERE id = ?", [file.id]);
+    if (!file) {
+      return res.status(404).json({ message: "File not found" });
+    }
 
-  res.json({ message: "Deleted" });
+    const publicId = file.path
+      .split("/")
+      .slice(-2)
+      .join("/")
+      .replace(/\.[^/.]+$/, "");
+
+    await cloudinary.uploader.destroy(publicId, {
+      resource_type: "auto",
+    });
+
+    await db.query("DELETE FROM file_shares WHERE file_id = ?", [fileId]);
+
+    await db.query("DELETE FROM files WHERE id = ?", [fileId]);
+
+    res.json({ message: "File deleted successfully" });
+  } catch (err) {
+    console.error("Delete file error:", err);
+    res.status(500).json({ message: "Failed to delete file" });
+  }
 });
+
 
 
 export default router
