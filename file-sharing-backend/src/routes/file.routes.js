@@ -6,6 +6,15 @@ import db from "../config/db.js"
 import cloudinary from "../config/cloudinary.js"
 
 
+const getResourceTypeFromMime = (mimeType) => {
+  if (!mimeType) return "raw";
+
+  if (mimeType.startsWith("image/")) return "image";
+  if (mimeType.startsWith("video/")) return "video";
+
+  return "raw";
+};
+
 const router = express.Router()
 
 router.post("/upload", protect, upload.array("files"), uploadFiles)
@@ -95,7 +104,7 @@ router.delete("/:id", protect, async (req, res) => {
       .replace(/\.[^/.]+$/, "");
 
     await cloudinary.uploader.destroy(publicId, {
-      resource_type: "auto",
+      resource_type: getResourceTypeFromMime(file.mime_type),
     });
 
     await db.query("DELETE FROM file_shares WHERE file_id = ?", [fileId]);
